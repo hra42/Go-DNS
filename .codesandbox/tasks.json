@@ -1,0 +1,29 @@
+{
+  // These tasks will run in order when initializing your CodeSandbox project.
+  "setupTasks": [],
+
+  // These tasks can be run from CodeSandbox. Running one will open a log in the app.
+  "tasks": {
+    "go run": {
+      "name": "Run Main",
+      "command": "go run ./cmd/Template/main.go",
+      "runAtStart": true,
+      "restartOn": {
+        "files": ["./cmd/Template/main.go"]
+      }
+    },
+    "go test": {
+      "name": "Run a Go Test",
+      "command": "go test ./tests/main_test.go",
+      "runAtStart": false,
+      "restartOn": {
+        "files": ["./tests/main_test.go"]
+      }
+    },
+    "go build": {
+      "name": "run a Go Build",
+      "command": "go build -o ./bin/template ./tests/main_test.go",
+      "runAtStart": false
+    }
+  }
+}

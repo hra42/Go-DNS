@@ -18,9 +18,9 @@ This app is written to make it super easy to get all relevant dns entries from a
   - lyncdiscover.example.com
   - selector1._domainkey.example.com
   - selector2._domainkey.example.com
-- Run the exe/binary with `Go_DNS_AMD64.exe -mx -domain example.com` to get all mx entries for example.com
-- Run the exe/binary with `Go_DNS_AMD64.exe -txt -domain example.com` to get all ns entries for example.com
-- Run the exe/binary with `Go_DNS_AMD64.exe -help` to get a list of all flags
+- Run `Go_DNS_AMD64.exe -mx -domain example.com` to get all mx entries for example.com
+- Run `Go_DNS_AMD64.exe -txt -domain example.com` to get all txt entries for example.com
+- Run `Go_DNS_AMD64.exe -help` to get a list of all flags
 
 ### Help Message
 ```bash

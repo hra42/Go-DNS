@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/hra42/Go-DNS/internal/desktopApp"
 	"github.com/hra42/Go-DNS/internal/dns"
 )
 
@@ -13,19 +14,18 @@ func main() {
 	all := flag.Bool("all", false, "Get all records for a domain")
 	flag.Parse()
 
-	dnsServers := dns.GetDNSServers()
 	switch true {
 	case *mx == true:
-		dns.PrintMXRecords(*domain, dnsServers)
+		dns.PrintMXRecords(*domain)
 	case *all == true:
-		dns.PrintMXRecords(*domain, dnsServers)
-		dns.PrintCNameRecords(*domain, dnsServers)
-		dns.PrintTXTRecords(*domain, dnsServers)
+		dns.PrintMXRecords(*domain)
+		dns.PrintCNameRecords(*domain)
+		dns.PrintTXTRecords(*domain)
 	case *cname == true:
-		dns.PrintCNameRecords(*domain, dnsServers)
+		dns.PrintCNameRecords(*domain)
 	case *txt == true:
-		dns.PrintTXTRecords(*domain, dnsServers)
+		dns.PrintTXTRecords(*domain)
 	default:
-		flag.Usage()
+		desktopApp.RunDesktop()
 	}
 }

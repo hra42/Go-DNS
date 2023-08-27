@@ -16,7 +16,7 @@ func GetDNSServers() map[string]net.IP {
 	return dnsServers
 }
 
-func getMXRecords(domain string, dnsServer net.IP) []string {
+func GetMXRecords(domain string, dnsServer net.IP) []string {
 
 	dnsClient := dns.Client{}
 	dnsMessage := dns.Msg{}
@@ -39,7 +39,7 @@ func getMXRecords(domain string, dnsServer net.IP) []string {
 	return mxRecords
 }
 
-func getCNameRecords(domain string, dnsServer net.IP) []string {
+func GetCNameRecords(domain string, dnsServer net.IP) []string {
 	dnsClient := dns.Client{}
 	dnsMessage := dns.Msg{}
 	dnsMessage.SetQuestion(dns.Fqdn(domain), dns.TypeCNAME)
@@ -61,7 +61,7 @@ func getCNameRecords(domain string, dnsServer net.IP) []string {
 	return cnameRecords
 }
 
-func getTXTRecords(domain string, dnsServer net.IP) []string {
+func GetTXTRecords(domain string, dnsServer net.IP) []string {
 
 	dnsClient := dns.Client{}
 	dnsMessage := dns.Msg{}
@@ -84,10 +84,10 @@ func getTXTRecords(domain string, dnsServer net.IP) []string {
 	return txtRecords
 }
 
-func PrintMXRecords(domain string, dnsServers map[string]net.IP) {
+func PrintMXRecords(domain string) {
 	fmt.Printf("Domain: %s\n", domain)
-	for dnsServerName, dnsServerIP := range dnsServers {
-		MXRecords := getMXRecords(domain, dnsServerIP)
+	for dnsServerName, dnsServerIP := range GetDNSServers() {
+		MXRecords := GetMXRecords(domain, dnsServerIP)
 
 		fmt.Printf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
 		if len(MXRecords) == 0 {
@@ -101,10 +101,10 @@ func PrintMXRecords(domain string, dnsServers map[string]net.IP) {
 	fmt.Println("------------------------------------")
 }
 
-func PrintTXTRecords(domain string, dnsServers map[string]net.IP) {
+func PrintTXTRecords(domain string) {
 	fmt.Printf("Domain: %s\n", domain)
-	for dnsServerName, dnsServerIP := range dnsServers {
-		TXTRecords := getTXTRecords(domain, dnsServerIP)
+	for dnsServerName, dnsServerIP := range GetDNSServers() {
+		TXTRecords := GetTXTRecords(domain, dnsServerIP)
 		fmt.Printf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
 		if len(TXTRecords) == 0 {
 			fmt.Printf("No TXT records found for %s\n", domain)
@@ -122,13 +122,13 @@ func PrintTXTRecords(domain string, dnsServers map[string]net.IP) {
 	fmt.Println("------------------------------------")
 }
 
-func PrintCNameRecords(domain string, dnsServers map[string]net.IP) {
+func PrintCNameRecords(domain string) {
 	subdomains := []string{"autodiscover", "lyncdiscover", "selector1._domainkey", "selector2._domainkey"}
 	for _, subdomain := range subdomains {
 		FullDomain := fmt.Sprintf("%s.%s", subdomain, domain)
 		fmt.Printf("Domain: %s\n", FullDomain)
-		for dnsServerName, dnsServerIP := range dnsServers {
-			CnameRecordsFullDomain := getCNameRecords(FullDomain, dnsServerIP)
+		for dnsServerName, dnsServerIP := range GetDNSServers() {
+			CnameRecordsFullDomain := GetCNameRecords(FullDomain, dnsServerIP)
 			fmt.Printf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
 			if len(CnameRecordsFullDomain) == 0 {
 				fmt.Printf("No CNAME records found for %s\n", FullDomain)

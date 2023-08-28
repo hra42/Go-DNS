@@ -87,13 +87,13 @@ func getCNameRecords(w fyne.Window) {
 	placeholder.Hide()
 
 	subdomains := []string{"autodiscover", "lyncdiscover", "selector1._domainkey", "selector2._domainkey"}
-	report := "" // Initialize the report string here
 
 	w.SetContent(container.NewVBox(
 		warning,
 		inputDomain,
 		placeholder,
 		widget.NewButton("Prüfen", func() {
+			report := "" // Initialize the report string here
 			for _, subdomain := range subdomains {
 				FullDomain := fmt.Sprintf("%s.%s", subdomain, inputDomain.Text)
 				report += fmt.Sprintf("Domain: %s\n", FullDomain)

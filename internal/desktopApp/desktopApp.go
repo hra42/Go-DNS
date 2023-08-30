@@ -24,20 +24,21 @@ func RunDesktop() {
 	}
 	w.SetIcon(resourceIconPng)
 
-	// set the window size
-	w.Resize(fyne.NewSize(400, 400))
+	// Resize and center the window
+	w.Resize(fyne.NewSize(1000, 1000))
+	w.CenterOnScreen()
 
 	// main menu
 	mainMenu := fyne.NewMainMenu(
 		fyne.NewMenu("Menu",
+			fyne.NewMenuItem("CNAME Einträge", func() {
+				getCNameRecords(w)
+			}),
 			fyne.NewMenuItem("MX Einträge", func() {
 				getMX(w)
 			}),
 			fyne.NewMenuItem("TXT Einträge", func() {
 				getTXT(w)
-			}),
-			fyne.NewMenuItem("CNAME Einträge", func() {
-				getCNameRecords(w)
 			}),
 		),
 	)
@@ -53,7 +54,7 @@ func getMX(w fyne.Window) {
 	placeholder := widget.NewLabel("This is a placeholder")
 	placeholder.Hide()
 
-	w.SetContent(container.NewVBox(
+	box := container.NewVBox(
 		inputDomain,
 		placeholder,
 		widget.NewButton("Prüfen", func() {
@@ -74,7 +75,10 @@ func getMX(w fyne.Window) {
 			placeholder.SetText(report)
 			placeholder.Show()
 		}),
-	))
+	)
+
+	scroll := container.NewScroll(box)
+	w.SetContent(scroll)
 }
 
 func getCNameRecords(w fyne.Window) {
@@ -88,7 +92,7 @@ func getCNameRecords(w fyne.Window) {
 
 	subdomains := []string{"autodiscover", "lyncdiscover", "selector1._domainkey", "selector2._domainkey"}
 
-	w.SetContent(container.NewVBox(
+	box := container.NewVBox(
 		warning,
 		inputDomain,
 		placeholder,
@@ -104,14 +108,14 @@ func getCNameRecords(w fyne.Window) {
 					report += fmt.Sprintf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
 
 					if len(CnameRecordsFullDomain) == 0 {
-						report += fmt.Sprintf("No CNAME records found for %s\n", FullDomain)
+						report += fmt.Sprintf("No CNAME records found for %s\n\n", FullDomain)
 					} else {
 						for _, record := range CnameRecordsFullDomain {
 							if record == "" {
-								report += fmt.Sprintf("No CNAME records found for %s\n", FullDomain)
+								report += fmt.Sprintf("No CNAME records found for %s\n\n", FullDomain)
 								break
 							} else {
-								report += fmt.Sprintf("CNAME record for %v: %v\n", FullDomain, record)
+								report += fmt.Sprintf("CNAME record for %v: %v\n\n", FullDomain, record)
 							}
 						}
 					}
@@ -121,7 +125,10 @@ func getCNameRecords(w fyne.Window) {
 			placeholder.SetText(report)
 			placeholder.Show()
 		}),
-	))
+	)
+
+	scroll := container.NewScroll(box)
+	w.SetContent(scroll)
 }
 
 func getTXT(w fyne.Window) {
@@ -131,7 +138,7 @@ func getTXT(w fyne.Window) {
 	placeholder := widget.NewLabel("This is a placeholder")
 	placeholder.Hide()
 
-	w.SetContent(container.NewVBox(
+	box := container.NewVBox(
 		inputDomain,
 		placeholder,
 		widget.NewButton("Prüfen", func() {
@@ -152,5 +159,8 @@ func getTXT(w fyne.Window) {
 			placeholder.SetText(report)
 			placeholder.Show()
 		}),
-	))
+	)
+
+	scroll := container.NewScroll(box)
+	w.SetContent(scroll)
 }

@@ -37,6 +37,11 @@ Usage of Go_DNS_AMD64.exe:
         Get TXT records for a domain
 ```
 
+### Desktop App
+
+Du kannst auch die Desktopanwendung verwenden. Diese enthält alle Funktionen der CLI App, aber mit einer GUI.
+
+
 ---
 
 ## Codesandbox

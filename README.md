@@ -39,7 +39,7 @@ Usage of Go_DNS_AMD64.exe:
 
 ### Desktop App
 
-Du kannst auch die Desktopanwendung verwenden. Diese enthält alle Funktionen der CLI App, aber mit einer GUI.
+You can also use the desktop application. It contains all the features of the CLI app, but with a GUI. 
 
 
 ---

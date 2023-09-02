@@ -40,9 +40,6 @@ func RunDesktop() {
 		fyne.NewMenuItem("TXT", func() {
 			getTXT(w)
 		}),
-		fyne.NewMenuItem("Quit", func() {
-			a.Quit()
-		}),
 	)
 
 	themeSwitcher := fyne.NewMenu(
@@ -60,13 +57,16 @@ func RunDesktop() {
 	w.SetMainMenu(mainMenu)
 
 	// set up the content
-	welcomeTitleText := canvas.NewText("Welcome to Go-DNS", theme.ForegroundColor())
+	// light blue
+	welcomeTitleText := canvas.NewText("Welcome to Go-DNS",
+		color.RGBA{R: 4, G: 118, B: 208, A: 255})
 	welcomeTitleText.TextStyle.Bold = true
 	welcomeTitleText.Alignment = fyne.TextAlignCenter
 	welcomeTitleText.TextSize = 60.0
 	welcomeTitle := container.NewCenter(welcomeTitleText)
 
-	welcomeText := canvas.NewText("This is a tool to check DNS records for Microsoft 365.", theme.ForegroundColor())
+	welcomeText := canvas.NewText("This is a tool to check DNS records for Microsoft 365.",
+		color.RGBA{R: 4, G: 118, B: 208, A: 255})
 	welcomeText.Alignment = fyne.TextAlignCenter
 	welcomeText.TextSize = 20.0
 	welcome := container.NewCenter(welcomeText)
@@ -82,12 +82,18 @@ func RunDesktop() {
 func getMX(w fyne.Window) {
 	// set up the content
 	w.SetTitle("Go-DNS - MX Records")
+	Title := canvas.NewText("MX Records",
+		color.RGBA{R: 4, G: 118, B: 208, A: 255})
+	Title.TextStyle.Bold = true
+	Title.Alignment = fyne.TextAlignCenter
+	Title.TextSize = 60.0
 	inputDomain := widget.NewEntry()
 	inputDomain.SetPlaceHolder("Enter the domain you want to check")
 	placeholder := widget.NewLabel("This is a placeholder")
 	placeholder.Hide()
 
 	box := container.NewVBox(
+		Title,
 		inputDomain,
 		placeholder,
 		widget.NewButton("Check", func() {
@@ -116,6 +122,11 @@ func getMX(w fyne.Window) {
 
 func getCNameRecords(w fyne.Window) {
 	w.SetTitle("Go-DNS - CNAME Records")
+	Title := canvas.NewText("CNAME Records",
+		color.RGBA{R: 4, G: 118, B: 208, A: 255})
+	Title.TextStyle.Bold = true
+	Title.Alignment = fyne.TextAlignCenter
+	Title.TextSize = 60.0
 	// set up the content
 	inputDomain := widget.NewEntry()
 	inputDomain.SetPlaceHolder("Enter the domain you want to check")
@@ -127,6 +138,7 @@ func getCNameRecords(w fyne.Window) {
 	subdomains := []string{"autodiscover", "lyncdiscover", "selector1._domainkey", "selector2._domainkey"}
 
 	box := container.NewVBox(
+		Title,
 		warning,
 		inputDomain,
 		placeholder,
@@ -167,6 +179,11 @@ func getCNameRecords(w fyne.Window) {
 
 func getTXT(w fyne.Window) {
 	w.SetTitle("Go-DNS - TXT Records")
+	Title := canvas.NewText("TXT Records",
+		color.RGBA{R: 4, G: 118, B: 208, A: 255})
+	Title.TextStyle.Bold = true
+	Title.Alignment = fyne.TextAlignCenter
+	Title.TextSize = 60.0
 	// set up the content
 	inputDomain := widget.NewEntry()
 	inputDomain.SetPlaceHolder("Enter the domain you want to check")
@@ -174,6 +191,7 @@ func getTXT(w fyne.Window) {
 	placeholder.Hide()
 
 	box := container.NewVBox(
+		Title,
 		inputDomain,
 		placeholder,
 		widget.NewButton("Check", func() {

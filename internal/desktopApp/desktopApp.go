@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/hra42/Go-DNS/internal/dns"
 	"image/color"
@@ -13,7 +14,6 @@ import (
 )
 
 func RunDesktop() {
-	// set up the app
 	a := app.New()
 	w := a.NewWindow("Go-DNS")
 
@@ -28,36 +28,69 @@ func RunDesktop() {
 	w.Resize(fyne.NewSize(1000, 1000))
 	w.CenterOnScreen()
 
-	// main menu
-	mainMenu := fyne.NewMainMenu(
-		fyne.NewMenu("Menu",
-			fyne.NewMenuItem("CNAME Einträge", func() {
-				getCNameRecords(w)
-			}),
-			fyne.NewMenuItem("MX Einträge", func() {
-				getMX(w)
-			}),
-			fyne.NewMenuItem("TXT Einträge", func() {
-				getTXT(w)
-			}),
-		),
+	// menu
+	dnsRecords := fyne.NewMenu(
+		"DNS Records",
+		fyne.NewMenuItem("MX", func() {
+			getMX(w)
+		}),
+		fyne.NewMenuItem("CNAME", func() {
+			getCNameRecords(w)
+		}),
+		fyne.NewMenuItem("TXT", func() {
+			getTXT(w)
+		}),
+		fyne.NewMenuItem("Quit", func() {
+			a.Quit()
+		}),
 	)
+
+	themeSwitcher := fyne.NewMenu(
+		"Theme",
+		fyne.NewMenuItem("Light", func() {
+			a.Settings().SetTheme(theme.LightTheme())
+		}),
+		fyne.NewMenuItem("Dark", func() {
+			a.Settings().SetTheme(theme.DarkTheme())
+		}),
+	)
+
+	mainMenu := fyne.NewMainMenu(dnsRecords, themeSwitcher)
+
 	w.SetMainMenu(mainMenu)
+
+	// set up the content
+	welcomeTitleText := canvas.NewText("Welcome to Go-DNS", theme.ForegroundColor())
+	welcomeTitleText.TextStyle.Bold = true
+	welcomeTitleText.Alignment = fyne.TextAlignCenter
+	welcomeTitleText.TextSize = 60.0
+	welcomeTitle := container.NewCenter(welcomeTitleText)
+
+	welcomeText := canvas.NewText("This is a tool to check DNS records for Microsoft 365.", theme.ForegroundColor())
+	welcomeText.Alignment = fyne.TextAlignCenter
+	welcomeText.TextSize = 20.0
+	welcome := container.NewCenter(welcomeText)
+
+	w.SetContent(container.NewVBox(
+		welcomeTitle,
+		welcome,
+	))
 
 	w.ShowAndRun()
 }
 
 func getMX(w fyne.Window) {
 	// set up the content
+	w.SetTitle("Go-DNS - MX Records")
 	inputDomain := widget.NewEntry()
-	inputDomain.SetPlaceHolder("Gib die Domäne die du prüfen möchtest ein!")
+	inputDomain.SetPlaceHolder("Enter the domain you want to check")
 	placeholder := widget.NewLabel("This is a placeholder")
 	placeholder.Hide()
 
 	box := container.NewVBox(
 		inputDomain,
 		placeholder,
-		widget.NewButton("Prüfen", func() {
+		widget.NewButton("Check", func() {
 			report := ""
 			for dnsServerName, dnsServerIP := range dns.GetDNSServers() {
 				MXRecords := dns.GetMXRecords(inputDomain.Text, dnsServerIP)
@@ -82,10 +115,11 @@ func getMX(w fyne.Window) {
 }
 
 func getCNameRecords(w fyne.Window) {
+	w.SetTitle("Go-DNS - CNAME Records")
 	// set up the content
 	inputDomain := widget.NewEntry()
-	inputDomain.SetPlaceHolder("Gib die Domäne die du prüfen möchtest ein!")
-	warning := canvas.NewText("Achtung: Dieser Test kann sehr lange dauern!", color.RGBA{R: 255, G: 0, B: 0, A: 255})
+	inputDomain.SetPlaceHolder("Enter the domain you want to check")
+	warning := canvas.NewText("Attention! This can take a long time", color.RGBA{R: 255, G: 0, B: 0, A: 255})
 	warning.TextStyle.Bold = true
 	placeholder := widget.NewLabel("This is a placeholder")
 	placeholder.Hide()
@@ -96,7 +130,7 @@ func getCNameRecords(w fyne.Window) {
 		warning,
 		inputDomain,
 		placeholder,
-		widget.NewButton("Prüfen", func() {
+		widget.NewButton("Check", func() {
 			report := "" // Initialize the report string here
 			for _, subdomain := range subdomains {
 				FullDomain := fmt.Sprintf("%s.%s", subdomain, inputDomain.Text)
@@ -132,16 +166,17 @@ func getCNameRecords(w fyne.Window) {
 }
 
 func getTXT(w fyne.Window) {
+	w.SetTitle("Go-DNS - TXT Records")
 	// set up the content
 	inputDomain := widget.NewEntry()
-	inputDomain.SetPlaceHolder("Gib die Domäne die du prüfen möchtest ein!")
+	inputDomain.SetPlaceHolder("Enter the domain you want to check")
 	placeholder := widget.NewLabel("This is a placeholder")
 	placeholder.Hide()
 
 	box := container.NewVBox(
 		inputDomain,
 		placeholder,
-		widget.NewButton("Prüfen", func() {
+		widget.NewButton("Check", func() {
 			report := ""
 			for dnsServerName, dnsServerIP := range dns.GetDNSServers() {
 				MXRecords := dns.GetTXTRecords(inputDomain.Text, dnsServerIP)

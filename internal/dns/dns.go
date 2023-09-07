@@ -1,7 +1,6 @@
 package dns
 
 import (
-	"fmt"
 	"github.com/miekg/dns"
 	"log"
 	"net"
@@ -82,67 +81,4 @@ func GetTXTRecords(domain string, dnsServer net.IP) []string {
 		}
 	}
 	return txtRecords
-}
-
-func PrintMXRecords(domain string) {
-	fmt.Printf("Domain: %s\n", domain)
-	for dnsServerName, dnsServerIP := range GetDNSServers() {
-		MXRecords := GetMXRecords(domain, dnsServerIP)
-
-		fmt.Printf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
-		if len(MXRecords) == 0 {
-			fmt.Printf("No MX records found for %s\n", domain)
-		} else {
-			for _, record := range MXRecords {
-				fmt.Printf("MX for record: %v\n", record)
-			}
-		}
-	}
-	fmt.Println("------------------------------------")
-}
-
-func PrintTXTRecords(domain string) {
-	fmt.Printf("Domain: %s\n", domain)
-	for dnsServerName, dnsServerIP := range GetDNSServers() {
-		TXTRecords := GetTXTRecords(domain, dnsServerIP)
-		fmt.Printf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
-		if len(TXTRecords) == 0 {
-			fmt.Printf("No TXT records found for %s\n", domain)
-		} else {
-			for _, record := range TXTRecords {
-				if record == "" {
-					fmt.Printf("No TXT records found for %s\n", domain)
-					break
-				} else {
-					fmt.Printf("TXT for record: %v\n", record)
-				}
-			}
-		}
-	}
-	fmt.Println("------------------------------------")
-}
-
-func PrintCNameRecords(domain string) {
-	subdomains := []string{"autodiscover", "lyncdiscover", "selector1._domainkey", "selector2._domainkey"}
-	for _, subdomain := range subdomains {
-		FullDomain := fmt.Sprintf("%s.%s", subdomain, domain)
-		fmt.Printf("Domain: %s\n", FullDomain)
-		for dnsServerName, dnsServerIP := range GetDNSServers() {
-			CnameRecordsFullDomain := GetCNameRecords(FullDomain, dnsServerIP)
-			fmt.Printf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
-			if len(CnameRecordsFullDomain) == 0 {
-				fmt.Printf("No CNAME records found for %s\n", FullDomain)
-			} else {
-				for _, record := range CnameRecordsFullDomain {
-					if record == "" {
-						fmt.Printf("No CNAME records found for %s\n", FullDomain)
-						break
-					} else {
-						fmt.Printf("CNAME record for %v: %v\n", FullDomain, record)
-					}
-				}
-			}
-		}
-		fmt.Println("------------------------------------")
-	}
 }

@@ -7,40 +7,23 @@
 This app is written to make it super easy to get all relevant dns entries from a domain.
 
 ---
+# Features
 
-## Usage
+The App asks the following dns servers:
+- [x] `Google (8.8.8.8)`
+- [x] `Cloudflare (1.1.1.1)`
+- [x] `Quad9 (9.9.9.9)`  
 
-- Download `Go_DNS_AMD64.exe` for Windows or `Go_DNS` for Linux
-- Run the `Go_DNS_AMD64.exe` from a command prompt
-- Run `Go_DNS_AMD64.exe -all -domain example.com` to get all dns entries listed below for example.com
-- Run `Go_DNS_AMD64.exe -cname -domain example.com` to get CNAME entries for 
-  - autodiscover.example.com
-  - lyncdiscover.example.com
-  - selector1._domainkey.example.com
-  - selector2._domainkey.example.com
-- Run `Go_DNS_AMD64.exe -mx -domain example.com` to get all mx entries for example.com
-- Run `Go_DNS_AMD64.exe -txt -domain example.com` to get all txt entries for example.com
-- Run `Go_DNS_AMD64.exe -help` to get a list of all flags
+For the following dns entries:
+- [x] `CNAME Entries`:
+  - [x] `autodiscover`
+  - [x] `lyncdiscover`
+  - [x] `selector1._domainkey`
+  - [x] `selector2._domainkey`
+- [x] `MX Entries`
+- [x] `TXT Entries`
 
-### Help Message
-```bash
-Usage of Go_DNS_AMD64.exe:
-  -all
-        Get all records for a domain
-  -cname
-        Get CNAME records for a domain
-  -domain string
-        Domain to query
-  -mx
-        Get MX records for a domain
-  -txt
-        Get TXT records for a domain
-```
-
-### Desktop App
-
-You can also use the desktop application. It contains all the features of the CLI app, but with a GUI. 
-
+It can also check the ssl status of a domain.
 
 ---
 

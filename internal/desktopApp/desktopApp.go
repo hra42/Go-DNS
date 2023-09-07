@@ -9,6 +9,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/hra42/Go-DNS/internal/dns"
+	"github.com/hra42/Go-DNS/internal/sslchecker"
 	"image/color"
 	"log"
 )
@@ -31,11 +32,14 @@ func RunDesktop() {
 	// menu
 	dnsRecords := fyne.NewMenu(
 		"DNS Records",
+		fyne.NewMenuItem("CNAME", func() {
+			getCNameRecords(w)
+		}),
 		fyne.NewMenuItem("MX", func() {
 			getMX(w)
 		}),
-		fyne.NewMenuItem("CNAME", func() {
-			getCNameRecords(w)
+		fyne.NewMenuItem("SSL Checker", func() {
+			checkSSL(w)
 		}),
 		fyne.NewMenuItem("TXT", func() {
 			getTXT(w)
@@ -77,6 +81,34 @@ func RunDesktop() {
 	))
 
 	w.ShowAndRun()
+}
+
+func checkSSL(w fyne.Window) {
+	w.SetTitle("Go-DNS - SSL Checker")
+	Title := canvas.NewText("SSL Check",
+		color.RGBA{R: 4, G: 118, B: 208, A: 255})
+	Title.TextStyle.Bold = true
+	Title.Alignment = fyne.TextAlignCenter
+	Title.TextSize = 60.0
+	inputDomain := widget.NewEntry()
+	inputDomain.SetPlaceHolder("Enter the domain you want to check - Format: domain.tld:Port")
+	placeholder := widget.NewLabel("This is a placeholder")
+	placeholder.Hide()
+	report := ""
+
+	box := container.NewVBox(
+		Title,
+		inputDomain,
+		placeholder,
+		widget.NewButton("Check", func() {
+			report = ""
+			report += sslchecker.CheckSSL(inputDomain.Text)
+			placeholder.SetText(report)
+			placeholder.Show()
+		}),
+	)
+	scroll := container.NewScroll(box)
+	w.SetContent(scroll)
 }
 
 func getMX(w fyne.Window) {

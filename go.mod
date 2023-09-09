@@ -4,6 +4,7 @@ go 1.21.1
 
 require (
 	fyne.io/fyne/v2 v2.4.0
+	github.com/catppuccin/go v0.2.0
 	github.com/miekg/dns v1.1.55
 )
 

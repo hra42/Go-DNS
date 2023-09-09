@@ -7,7 +7,7 @@
 This app is written to make it super easy to get all relevant dns entries from a domain.
 
 ---
-# Features
+## Features
 
 The App asks the following dns servers:
 - [x] `Google (8.8.8.8)`
@@ -27,6 +27,16 @@ It can also check the ssl status of a domain.
 
 ---
 
+## Preview
+### Light Mode
+![Light Theme](./images/main-light.jpg)
+
+### Dark Mode
+![Dark Theme](./images/main-dark.jpg)
+
+---
+
 ## Codesandbox
 
 [![Edit in CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/github/HRA42/go-dns)
+

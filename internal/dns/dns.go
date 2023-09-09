@@ -1,12 +1,13 @@
 package dns
 
 import (
+	"fmt"
 	"github.com/miekg/dns"
 	"log"
 	"net"
 )
 
-func GetDNSServers() map[string]net.IP {
+func getDNSServers() map[string]net.IP {
 	dnsServers := map[string]net.IP{}
 	dnsServers["Google"] = net.ParseIP("8.8.8.8")
 	dnsServers["Cloudflare"] = net.ParseIP("1.1.1.1")
@@ -15,7 +16,7 @@ func GetDNSServers() map[string]net.IP {
 	return dnsServers
 }
 
-func GetMXRecords(domain string, dnsServer net.IP) []string {
+func getMXRecords(domain string, dnsServer net.IP) []string {
 
 	dnsClient := dns.Client{}
 	dnsMessage := dns.Msg{}
@@ -38,7 +39,7 @@ func GetMXRecords(domain string, dnsServer net.IP) []string {
 	return mxRecords
 }
 
-func GetCNameRecords(domain string, dnsServer net.IP) []string {
+func getCNameRecords(domain string, dnsServer net.IP) []string {
 	dnsClient := dns.Client{}
 	dnsMessage := dns.Msg{}
 	dnsMessage.SetQuestion(dns.Fqdn(domain), dns.TypeCNAME)
@@ -60,7 +61,7 @@ func GetCNameRecords(domain string, dnsServer net.IP) []string {
 	return cnameRecords
 }
 
-func GetTXTRecords(domain string, dnsServer net.IP) []string {
+func getTXTRecords(domain string, dnsServer net.IP) []string {
 
 	dnsClient := dns.Client{}
 	dnsMessage := dns.Msg{}
@@ -81,4 +82,66 @@ func GetTXTRecords(domain string, dnsServer net.IP) []string {
 		}
 	}
 	return txtRecords
+}
+
+func GetCnameReport(url string) (report string) {
+	subdomains := []string{"autodiscover", "lyncdiscover", "selector1._domainkey", "selector2._domainkey"}
+	for _, subdomain := range subdomains {
+		FullDomain := fmt.Sprintf("%s.%s", subdomain, url)
+		report += fmt.Sprintf("Domain: %s\n", FullDomain)
+
+		for dnsServerName, dnsServerIP := range getDNSServers() {
+			CnameRecordsFullDomain := getCNameRecords(FullDomain, dnsServerIP)
+
+			report += fmt.Sprintf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
+
+			if len(CnameRecordsFullDomain) == 0 {
+				report += fmt.Sprintf("No CNAME records found for %s\n\n", FullDomain)
+			} else {
+				for _, record := range CnameRecordsFullDomain {
+					if record == "" {
+						report += fmt.Sprintf("No CNAME records found for %s\n\n", FullDomain)
+						break
+					} else {
+						report += fmt.Sprintf("CNAME record for %v: %v\n\n", FullDomain, record)
+					}
+				}
+			}
+		}
+	}
+	return
+}
+
+func GetMXReport(url string) (report string) {
+	for dnsServerName, dnsServerIP := range getDNSServers() {
+		MXRecords := getMXRecords(url, dnsServerIP)
+
+		report += "DNS server provider: " + dnsServerName + "\nIP: " + dnsServerIP.String() + "\n"
+		report += "Domain: " + url + "\n"
+		if len(MXRecords) == 0 {
+			report += "No MX records found for " + url + "\n"
+		} else {
+			for _, record := range MXRecords {
+				report += "MX record: " + record + "\n\n"
+			}
+		}
+	}
+	return
+}
+
+func GetTXTReport(url string) (report string) {
+	for dnsServerName, dnsServerIP := range getDNSServers() {
+		MXRecords := getTXTRecords(url, dnsServerIP)
+
+		report += "DNS server provider: " + dnsServerName + "\nIP: " + dnsServerIP.String() + "\n"
+		report += "Domain: " + url + "\n"
+		if len(MXRecords) == 0 {
+			report += "No TXT records found for " + url + "\n"
+		} else {
+			for _, record := range MXRecords {
+				report += "TXT record: " + record + "\n\n"
+			}
+		}
+	}
+	return
 }

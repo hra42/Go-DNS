@@ -1,13 +1,13 @@
 package desktopApp
 
 import (
-	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	catppuccin "github.com/catppuccin/go"
 	"github.com/hra42/Go-DNS/internal/dns"
 	"github.com/hra42/Go-DNS/internal/sslchecker"
 	"image/color"
@@ -15,10 +15,11 @@ import (
 )
 
 func RunDesktop() {
+	// create a new app and window
 	a := app.New()
 	w := a.NewWindow("Go-DNS")
 
-	// set the icon
+	// set the icon from cloudflare r2 bucket
 	resourceIconPng, err := fyne.LoadResourceFromURLString("https://gpt-files.postrausch.tech/go-dns.png")
 	if err != nil {
 		log.Fatal(err)
@@ -29,7 +30,7 @@ func RunDesktop() {
 	w.Resize(fyne.NewSize(1000, 1000))
 	w.CenterOnScreen()
 
-	// menu
+	// main menu
 	dnsRecords := fyne.NewMenu(
 		"DNS Records",
 		fyne.NewMenuItem("CNAME", func() {
@@ -46,8 +47,10 @@ func RunDesktop() {
 		}),
 	)
 
+	// theme menu
 	themeSwitcher := fyne.NewMenu(
 		"Theme",
+		// TODO: replace this with a function that is not deprecated & define catppuccin theme
 		fyne.NewMenuItem("Light", func() {
 			a.Settings().SetTheme(theme.LightTheme())
 		}),
@@ -56,110 +59,35 @@ func RunDesktop() {
 		}),
 	)
 
+	// make menu
 	mainMenu := fyne.NewMainMenu(dnsRecords, themeSwitcher)
-
 	w.SetMainMenu(mainMenu)
 
-	// set up the content
-	// light blue
-	welcomeTitleText := canvas.NewText("Welcome to Go-DNS",
-		color.RGBA{R: 4, G: 118, B: 208, A: 255})
-	welcomeTitleText.TextStyle.Bold = true
-	welcomeTitleText.Alignment = fyne.TextAlignCenter
-	welcomeTitleText.TextSize = 60.0
+	// Set the welcome title when the app starts
+	welcomeTitleText := getTitle(w, "")
 	welcomeTitle := container.NewCenter(welcomeTitleText)
 
+	// Set the welcome text when the app starts
+	// make text light blue, bold and centered with text size of 20.
 	welcomeText := canvas.NewText("This is a tool to check DNS records for Microsoft 365.",
-		color.RGBA{R: 4, G: 118, B: 208, A: 255})
+		getCatppucinColor(catppuccin.Mocha.Blue()))
 	welcomeText.Alignment = fyne.TextAlignCenter
 	welcomeText.TextSize = 20.0
 	welcome := container.NewCenter(welcomeText)
 
+	// set the content on canvas
 	w.SetContent(container.NewVBox(
 		welcomeTitle,
 		welcome,
 	))
 
+	// start the main app
 	w.ShowAndRun()
 }
 
-func checkSSL(w fyne.Window) {
-	w.SetTitle("Go-DNS - SSL Checker")
-	Title := canvas.NewText("SSL Check",
-		color.RGBA{R: 4, G: 118, B: 208, A: 255})
-	Title.TextStyle.Bold = true
-	Title.Alignment = fyne.TextAlignCenter
-	Title.TextSize = 60.0
-	inputDomain := widget.NewEntry()
-	inputDomain.SetPlaceHolder("Enter the domain you want to check - Format: domain.tld:Port")
-	placeholder := widget.NewLabel("This is a placeholder")
-	placeholder.Hide()
-	report := ""
-
-	box := container.NewVBox(
-		Title,
-		inputDomain,
-		placeholder,
-		widget.NewButton("Check", func() {
-			report = ""
-			report += sslchecker.CheckSSL(inputDomain.Text)
-			placeholder.SetText(report)
-			placeholder.Show()
-		}),
-	)
-	scroll := container.NewScroll(box)
-	w.SetContent(scroll)
-}
-
-func getMX(w fyne.Window) {
-	// set up the content
-	w.SetTitle("Go-DNS - MX Records")
-	Title := canvas.NewText("MX Records",
-		color.RGBA{R: 4, G: 118, B: 208, A: 255})
-	Title.TextStyle.Bold = true
-	Title.Alignment = fyne.TextAlignCenter
-	Title.TextSize = 60.0
-	inputDomain := widget.NewEntry()
-	inputDomain.SetPlaceHolder("Enter the domain you want to check")
-	placeholder := widget.NewLabel("This is a placeholder")
-	placeholder.Hide()
-
-	box := container.NewVBox(
-		Title,
-		inputDomain,
-		placeholder,
-		widget.NewButton("Check", func() {
-			report := ""
-			for dnsServerName, dnsServerIP := range dns.GetDNSServers() {
-				MXRecords := dns.GetMXRecords(inputDomain.Text, dnsServerIP)
-
-				report += "DNS server provider: " + dnsServerName + "\nIP: " + dnsServerIP.String() + "\n"
-				report += "Domain: " + inputDomain.Text + "\n"
-				if len(MXRecords) == 0 {
-					report += "No MX records found for " + inputDomain.Text + "\n"
-				} else {
-					for _, record := range MXRecords {
-						report += "MX record: " + record + "\n\n"
-					}
-				}
-			}
-			placeholder.SetText(report)
-			placeholder.Show()
-		}),
-	)
-
-	scroll := container.NewScroll(box)
-	w.SetContent(scroll)
-}
-
 func getCNameRecords(w fyne.Window) {
-	w.SetTitle("Go-DNS - CNAME Records")
-	Title := canvas.NewText("CNAME Records",
-		color.RGBA{R: 4, G: 118, B: 208, A: 255})
-	Title.TextStyle.Bold = true
-	Title.Alignment = fyne.TextAlignCenter
-	Title.TextSize = 60.0
-	// set up the content
+	// Set up the window for CNAME Records Lookup
+	title := getTitle(w, "CNAME Records")
 	inputDomain := widget.NewEntry()
 	inputDomain.SetPlaceHolder("Enter the domain you want to check")
 	warning := canvas.NewText("Attention! This can take a long time", color.RGBA{R: 255, G: 0, B: 0, A: 255})
@@ -167,38 +95,14 @@ func getCNameRecords(w fyne.Window) {
 	placeholder := widget.NewLabel("This is a placeholder")
 	placeholder.Hide()
 
-	subdomains := []string{"autodiscover", "lyncdiscover", "selector1._domainkey", "selector2._domainkey"}
-
 	box := container.NewVBox(
-		Title,
+		title,
 		warning,
 		inputDomain,
 		placeholder,
 		widget.NewButton("Check", func() {
-			report := "" // Initialize the report string here
-			for _, subdomain := range subdomains {
-				FullDomain := fmt.Sprintf("%s.%s", subdomain, inputDomain.Text)
-				report += fmt.Sprintf("Domain: %s\n", FullDomain)
-
-				for dnsServerName, dnsServerIP := range dns.GetDNSServers() {
-					CnameRecordsFullDomain := dns.GetCNameRecords(FullDomain, dnsServerIP)
-
-					report += fmt.Sprintf("DNS server provider: %s\nIP: %s\n", dnsServerName, dnsServerIP)
-
-					if len(CnameRecordsFullDomain) == 0 {
-						report += fmt.Sprintf("No CNAME records found for %s\n\n", FullDomain)
-					} else {
-						for _, record := range CnameRecordsFullDomain {
-							if record == "" {
-								report += fmt.Sprintf("No CNAME records found for %s\n\n", FullDomain)
-								break
-							} else {
-								report += fmt.Sprintf("CNAME record for %v: %v\n\n", FullDomain, record)
-							}
-						}
-					}
-				}
-			}
+			report := ""
+			report += dns.GetCnameReport(inputDomain.Text)
 			warning.Hide()
 			placeholder.SetText(report)
 			placeholder.Show()
@@ -209,38 +113,21 @@ func getCNameRecords(w fyne.Window) {
 	w.SetContent(scroll)
 }
 
-func getTXT(w fyne.Window) {
-	w.SetTitle("Go-DNS - TXT Records")
-	Title := canvas.NewText("TXT Records",
-		color.RGBA{R: 4, G: 118, B: 208, A: 255})
-	Title.TextStyle.Bold = true
-	Title.Alignment = fyne.TextAlignCenter
-	Title.TextSize = 60.0
-	// set up the content
+func getMX(w fyne.Window) {
+	// set up the window for MX Record Lookup
+	title := getTitle(w, "MX Records")
 	inputDomain := widget.NewEntry()
 	inputDomain.SetPlaceHolder("Enter the domain you want to check")
 	placeholder := widget.NewLabel("This is a placeholder")
 	placeholder.Hide()
 
 	box := container.NewVBox(
-		Title,
+		title,
 		inputDomain,
 		placeholder,
 		widget.NewButton("Check", func() {
 			report := ""
-			for dnsServerName, dnsServerIP := range dns.GetDNSServers() {
-				MXRecords := dns.GetTXTRecords(inputDomain.Text, dnsServerIP)
-
-				report += "DNS server provider: " + dnsServerName + "\nIP: " + dnsServerIP.String() + "\n"
-				report += "Domain: " + inputDomain.Text + "\n"
-				if len(MXRecords) == 0 {
-					report += "No TXT records found for " + inputDomain.Text + "\n"
-				} else {
-					for _, record := range MXRecords {
-						report += "TXT record: " + record + "\n\n"
-					}
-				}
-			}
+			report += dns.GetMXReport(inputDomain.Text)
 			placeholder.SetText(report)
 			placeholder.Show()
 		}),
@@ -248,4 +135,78 @@ func getTXT(w fyne.Window) {
 
 	scroll := container.NewScroll(box)
 	w.SetContent(scroll)
+}
+
+func checkSSL(w fyne.Window) {
+	// Set up the window for SSL Checker
+	title := getTitle(w, "SSL Checker")
+	inputDomain := widget.NewEntry()
+	inputDomain.SetPlaceHolder("Enter the domain you want to check - Format: domain.tld:Port")
+	placeholder := widget.NewLabel("This is a placeholder")
+	placeholder.Hide()
+
+	// Set the content on canvas
+	box := container.NewVBox(
+		title,
+		inputDomain,
+		placeholder,
+		widget.NewButton("Check", func() {
+			report := ""
+			report += sslchecker.CheckSSL(inputDomain.Text)
+			placeholder.SetText(report)
+			placeholder.Show()
+		}),
+	)
+	scroll := container.NewScroll(box)
+	w.SetContent(scroll)
+}
+
+func getTXT(w fyne.Window) {
+	// set up the window for TXT Record Lookup
+	title := getTitle(w, "TXT Records")
+	inputDomain := widget.NewEntry()
+	inputDomain.SetPlaceHolder("Enter the domain you want to check")
+	placeholder := widget.NewLabel("This is a placeholder")
+	placeholder.Hide()
+
+	box := container.NewVBox(
+		title,
+		inputDomain,
+		placeholder,
+		widget.NewButton("Check", func() {
+			report := ""
+			report += dns.GetTXTReport(inputDomain.Text)
+			placeholder.SetText(report)
+			placeholder.Show()
+		}),
+	)
+
+	scroll := container.NewScroll(box)
+	w.SetContent(scroll)
+}
+
+func getTitle(w fyne.Window, titleText string) (title *canvas.Text) {
+	blueTitle := getCatppucinColor(catppuccin.Mocha.Blue())
+	// set the title of a window
+	if titleText == "" {
+		w.SetTitle("Go-DNS")
+		title = canvas.NewText("Welcome to Go-DNS", blueTitle)
+		title.TextStyle.Bold = true
+		title.Alignment = fyne.TextAlignCenter
+		title.TextSize = 60.0
+	} else {
+		w.SetTitle("Go-DNS - " + titleText)
+		// define the title text
+		title = canvas.NewText(titleText, blueTitle)
+		title.TextStyle.Bold = true
+		title.Alignment = fyne.TextAlignCenter
+		title.TextSize = 60.0
+	}
+	return
+}
+
+func getCatppucinColor(c catppuccin.Color) (col color.Color) {
+	// change opacity of the color to 255
+	col = color.RGBA{R: uint8(c.RGB[0]), G: uint8(c.RGB[1]), B: uint8(c.RGB[2]), A: 255}
+	return
 }

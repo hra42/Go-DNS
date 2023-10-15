@@ -1,8 +1,7 @@
 # Go DNS
 
 > [!NOTE]
-> This is still in development. Please add a feature request if you want a feature added.
-> Feel free to fork this!
+> Download the latest version from the [release page](https://github.com/HRA42/Go-DNS/releases) and run the executable.
 
 This app is written to make it super easy to get all relevant dns entries from a domain.
 
@@ -24,6 +23,13 @@ For the following dns entries:
 - [x] `TXT Entries`
 
 It can also check the ssl status of a domain.
+
+---
+
+## Packaging
+You need to set up [Fyne](https://developer.fyne.io/started/)
+After that you can clone the repository and run `fyne package` to build the app.  
+Don't forget to change the metadata in [FyneApp.toml](FyneApp.toml).
 
 ---
 

@@ -1,0 +1,8 @@
+Website = "https://github.com/HRA42/Go-DNS"
+
+[Details]
+  Icon = "Icon.png"
+  Name = "Go-DNS"
+  ID = "tech.postrausch.go-dns"
+  Version = "2.4.1"
+  Build = 3
